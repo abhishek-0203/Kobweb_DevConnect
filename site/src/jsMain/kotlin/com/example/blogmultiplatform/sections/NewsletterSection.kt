@@ -129,7 +129,7 @@ fun NewsletterContent(
                 .fontSize(36.px)
                 .fontWeight(FontWeight.Bold)
                 .textAlign(TextAlign.Center),
-            text = "Sign up to our Newsletter!"
+            text = "Sign up to our Platform!"
         )
         SpanText(
             modifier = Modifier
@@ -140,7 +140,7 @@ fun NewsletterContent(
                 .fontWeight(FontWeight.Normal)
                 .color(JsTheme.HalfBlack.rgb)
                 .textAlign(TextAlign.Center),
-            text = "Keep up with the latest news and blogs."
+            text = "Keep up with the latest posts and works."
         )
         if (breakpoint > Breakpoint.SM) {
             Row(

@@ -45,7 +45,7 @@ fun FooterSection() {
                         .fontFamily(FONT_FAMILY)
                         .fontSize(14.px)
                         .color(JsTheme.Primary.rgb),
-                    text = "Abhishek Verma"
+                    text = "DevConnect"
                 )
             }
         }

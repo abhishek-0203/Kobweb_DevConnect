@@ -33,6 +33,7 @@ import com.varabyte.kobweb.compose.ui.modifiers.margin
 import com.varabyte.kobweb.compose.ui.modifiers.maxWidth
 import com.varabyte.kobweb.compose.ui.modifiers.onClick
 import com.varabyte.kobweb.compose.ui.modifiers.width
+import com.varabyte.kobweb.compose.ui.modifiers.padding
 import com.varabyte.kobweb.core.rememberPageContext
 import com.varabyte.kobweb.silk.components.graphics.Image
 import com.varabyte.kobweb.silk.components.icons.fa.FaBars
@@ -43,8 +44,9 @@ import kotlinx.browser.document
 import kotlinx.browser.window
 import kotlinx.browser.localStorage
 import com.varabyte.kobweb.silk.components.text.SpanText
+import com.varabyte.kobweb.compose.dom.svg.Svg
+import com.varabyte.kobweb.compose.dom.svg.Path
 import org.jetbrains.compose.web.dom.A
-import org.jetbrains.compose.web.attributes.AttrsScope
 import org.w3c.dom.get
 import org.w3c.dom.set
 import org.jetbrains.compose.web.css.percent
@@ -52,7 +54,12 @@ import org.jetbrains.compose.web.css.px
 import org.w3c.dom.HTMLInputElement
 import org.w3c.dom.StorageEvent
 import org.w3c.dom.events.Event
-//import org.w3c.dom.events.StorageEvent
+import androidx.compose.runtime.rememberCoroutineScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import com.example.blogmultiplatform.util.logout
+import com.varabyte.kobweb.compose.style.KobwebComposeStyleSheet.attr
+import com.varabyte.kobweb.compose.ui.toAttrs
 
 // New: simple visual switch component
 @Composable
@@ -119,9 +126,12 @@ fun Header(
     onMenuOpen: () -> Unit
 ) {
     val context = rememberPageContext()
+    val scope = rememberCoroutineScope()
     var fullSearchBarOpened by remember { mutableStateOf(false) }
     // Toggle state persisted in localStorage
     var headerToggleOn by remember { mutableStateOf(localStorage["headerToggle"]?.toBoolean() ?: false) }
+    // Transient toast shown when user switches toggle on
+    var showOnlineToast by remember { mutableStateOf(false) }
 
     // Read display name from localStorage and react to storage events
     var displayName by remember { mutableStateOf(localStorage["displayName"] ?: "") }
@@ -142,7 +152,7 @@ fun Header(
                 }
             }
         }
-        val profileUpdatedHandler = { e: Event ->
+        val profileUpdatedHandler = { _: Event ->
             try {
                 // The Profile page dispatches a simple Event('profileUpdated')
                 // Read fresh values from localStorage so the header updates in this tab
@@ -229,17 +239,74 @@ fun Header(
         ToggleSwitch(isOn = headerToggleOn, onToggle = {
             headerToggleOn = it
             localStorage["headerToggle"] = headerToggleOn.toString()
+            // Show a small transient message when the toggle is switched ON
+            if (headerToggleOn) {
+                showOnlineToast = true
+                scope.launch {
+                    delay(1000)
+                    showOnlineToast = false
+                }
+            }
         })
         // small spacer using Box
         Box(modifier = Modifier.width(12.px))
 
+        // Transient toast message near the toggle
+        if (showOnlineToast) {
+            SpanText(
+                modifier = Modifier
+                    .margin(right = 12.px)
+                    .backgroundColor(JsTheme.Primary.rgb)
+                    .color(Colors.White)
+                    .borderRadius(r = 8.px)
+                    .padding(leftRight = 10.px)
+                    .padding(topBottom = 4.px),
+                text = "You are now online."
+            )
+        }
+
         if (displayName.isNotBlank()) {
             // show display name instead of Sign in
-            SpanText(modifier = Modifier.cursor(Cursor.Pointer).margin(right = 8.px).color(Colors.White).onClick { context.router.navigateTo(Screen.ProfilePage.route) }, text = "Hi, $displayName")
+            SpanText(
+                modifier = Modifier.cursor(Cursor.Pointer).margin(right = 8.px).color(Colors.White)
+                    .onClick { context.router.navigateTo(Screen.ProfilePage.route) },
+                text = "Hi, $displayName"
+            )
+            // Show a compact logout icon on medium+ screens; hide on small/mobile
+            if (breakpoint > Breakpoint.MD) {
+                Box(
+                    modifier = Modifier
+                        .cursor(Cursor.Pointer)
+                        .margin(right = 8.px)
+                        .width(28.px)
+                        .height(28.px)
+                        .onClick {
+                            logout()
+                            context.router.navigateTo(Screen.AdminLogin.route)
+                        }
+                ) {
+                    // Inline SVG using the shared path icon for logout
+                    Svg(
+                        attrs = Modifier.width(20.px).height(20.px).toAttrs {
+                            attr("viewBox", "0 0 24 24")
+                            attr("fill", "none")
+                            attr("title", "Logout")
+                        }
+                    ) {
+                        Path {
+                            attr(attr = "d", value = Res.PathIcon.logout)
+                            attr(attr = "stroke", value = "${JsTheme.HalfWhite.hex}")
+                            attr(attr = "stroke-width", value = "2")
+                            attr(attr = "stroke-linecap", value = "round")
+                            attr(attr = "stroke-linejoin", value = "round")
+                        }
+                    }
+                }
+            }
         } else {
             BSButton(
                 text = "Sign in",
-                onClick = {context.router.navigateTo(Screen.AdminLogin.route)}
+                onClick = { context.router.navigateTo(Screen.AdminLogin.route) }
             )
         }
         // Avatar: show a small circular avatar if available; clicking it goes to the profile page
