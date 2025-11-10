@@ -43,7 +43,6 @@ import com.varabyte.kobweb.compose.ui.modifiers.overflow
 import com.varabyte.kobweb.compose.ui.modifiers.padding
 import com.varabyte.kobweb.compose.ui.modifiers.position
 import com.varabyte.kobweb.compose.ui.modifiers.scrollBehavior
-import com.varabyte.kobweb.compose.ui.modifiers.transition
 import com.varabyte.kobweb.compose.ui.modifiers.translateX
 import com.varabyte.kobweb.compose.ui.modifiers.width
 import com.varabyte.kobweb.compose.ui.modifiers.zIndex
@@ -62,7 +61,6 @@ import com.varabyte.kobweb.silk.theme.breakpoint.rememberBreakpoint
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.web.css.Position
-import org.jetbrains.compose.web.css.ms
 import org.jetbrains.compose.web.css.percent
 import org.jetbrains.compose.web.css.px
 import org.jetbrains.compose.web.css.vh
@@ -135,6 +133,16 @@ fun NavigationItems() {
             context.router.navigateTo(Screen.AdminMyPosts.route)
         }
     )
+    NavigationItem(
+        modifier = Modifier.margin(bottom = 24.px),
+        selected = context.route.path == Screen.ContactPage.route,
+        title = "Contact",
+        icon = Res.PathIcon.posts, // fallback icon for contact
+        onClick = {
+            context.router.navigateTo(Screen.ContactPage.route)
+        }
+    )
+
     NavigationItem(
         title = "Logout",
         icon = Res.PathIcon.logout,

@@ -47,6 +47,8 @@ class MongoDB(private val context: InitApiContext) : MongoRepository {
     private val postCollection = database.getCollection<Post>("post")
     private val newsletterCollection = database.getCollection<Newsletter>("newsletter")
     private val paymentCollection = database.getCollection<Payment>("payment")
+    // New contacts collection for ContactMessage
+    private val contactsCollection = database.getCollection<com.example.shared.ContactMessage>("contacts")
 
     override suspend fun addPost(post: Post): Boolean {
         return postCollection.insertOne(post).wasAcknowledged()
@@ -284,6 +286,19 @@ class MongoDB(private val context: InitApiContext) : MongoRepository {
     suspend fun getProfileById(id: String): Profile? {
         return try {
             profileCollection.find(Filters.eq(Profile::_id.name, id)).firstOrNull()
+        } catch (e: Exception) {
+            context.logger.error(e.message.toString())
+            null
+        }
+    }
+
+    // Save contact messages submitted via the contact form
+    suspend fun saveContactMessage(contact: com.example.shared.ContactMessage): String? {
+        return try {
+            val id = if (contact.id.isNullOrBlank()) ObjectId().toHexString() else contact.id!!
+            val toInsert = contact.copy(id = id, createdAt = System.currentTimeMillis())
+            val res = contactsCollection.insertOne(toInsert)
+            if (res.wasAcknowledged()) id else null
         } catch (e: Exception) {
             context.logger.error(e.message.toString())
             null

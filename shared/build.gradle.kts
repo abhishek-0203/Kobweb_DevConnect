@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.kotlin.multiplatform)
     alias(libs.plugins.ksp)
     alias(libs.plugins.kobweb.library)
+    alias(libs.plugins.serialization.plugin)
 }
 
 group = "com.example.shared"

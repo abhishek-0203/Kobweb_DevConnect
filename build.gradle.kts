@@ -1,3 +1,24 @@
+import java.io.File
+
+// Ensure site KSP cache symbols exist early during configuration to avoid KSP FileNotFound errors
+val siteKspJsSymbols = File(rootDir, "site/build/kspCaches/js/jsMain/symbols")
+val siteKspJvmSymbols = File(rootDir, "site/build/kspCaches/jvm/jvmMain/symbols")
+
+fun ensureSymbols(file: File) {
+    try {
+        val dir = file.parentFile
+        if (!dir.exists()) dir.mkdirs()
+        if (!file.exists()) file.createNewFile()
+        if (file.length() == 0L) file.writeText("{}")
+    } catch (e: Exception) {
+        // Best-effort; avoid failing configuration. KSP tasks will also attempt to create files.
+        println("Warning: failed to create KSP symbols file ${file.path}: ${e.message}")
+    }
+}
+
+ensureSymbols(siteKspJsSymbols)
+ensureSymbols(siteKspJvmSymbols)
+
 /*
 plugins {
     alias(libs.plugins.kotlin.multiplatform)

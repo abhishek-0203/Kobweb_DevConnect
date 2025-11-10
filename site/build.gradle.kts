@@ -83,7 +83,23 @@ if (kspJvmSymbolsFile.length() == 0L) {
     kspJvmSymbolsFile.writeText("{}")
 }
 
+// New: explicit task to ensure KSP cache files exist. Some KSP worker processes may run in a way
+// that requires the files to already be present and this task will be run before KSP tasks execute.
+tasks.register("ensureKspCaches") {
+    doLast {
+        if (!kspJsDir.exists()) kspJsDir.mkdirs()
+        if (!kspSymbolsFile.exists()) kspSymbolsFile.createNewFile()
+        if (kspSymbolsFile.length() == 0L) kspSymbolsFile.writeText("{}")
+
+        if (!kspJvmDir.exists()) kspJvmDir.mkdirs()
+        if (!kspJvmSymbolsFile.exists()) kspJvmSymbolsFile.createNewFile()
+        if (kspJvmSymbolsFile.length() == 0L) kspJvmSymbolsFile.writeText("{}")
+    }
+}
+
+// Make KSP tasks depend on ensureKspCaches to guarantee files exist on disk before KSP workers start.
 tasks.matching { it.name == "kspKotlinJs" || it.name == "kspKotlinJvm" }.configureEach {
+    dependsOn("ensureKspCaches")
     doFirst {
         if (!kspJsDir.exists()) {
             kspJsDir.mkdirs()

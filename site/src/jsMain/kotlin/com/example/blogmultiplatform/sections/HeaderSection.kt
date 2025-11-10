@@ -228,6 +228,8 @@ fun Header(
         Row(verticalAlignment = Alignment.CenterVertically) {
             // Chat: client-side route
             SpanText(modifier = Modifier.cursor(Cursor.Pointer).margin(right = 12.px).color(Colors.White).onClick { context.router.navigateTo(Screen.ChatPage.route) }, text = "Chat")
+            // Contact link: public route to contact page
+            SpanText(modifier = Modifier.cursor(Cursor.Pointer).margin(right = 12.px).color(Colors.White).onClick { context.router.navigateTo(Screen.ContactPage.route) }, text = "Contact")
             // Profile: use a plain anchor to ensure the route is reachable even without JS router firing
             A(href = Screen.ProfilePage.route, attrs = {
                 style { property("text-decoration", "none") }

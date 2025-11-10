@@ -41,4 +41,7 @@ sealed class Screen(val route: String) {
 
     object ChatPage : Screen(route = "/chat")
     object ProfilePage : Screen(route = "/profile")
+
+    object ContactPage : Screen(route = "/contact")
+
 }
