@@ -186,11 +186,17 @@ fun PaymentScreen() {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         // Header
-        Box(modifier = Modifier.fillMaxWidth().maxWidth(1100.px).styleModifier { property("padding","18px"); property("border-radius","12px"); property("background","white"); property("box-shadow","0 8px 30px rgba(16,24,40,0.08)") }.padding(bottom = 12.px)) {
+        Box(modifier = Modifier.fillMaxWidth().maxWidth(1100.px).styleModifier { property("padding","18px"); property("border-radius","12px"); property("background","white"); property("box-shadow","0 8px 30px rgba(16,24,40,0.08)"); property("position","relative") }.padding(bottom = 12.px)) {
             Column(modifier = Modifier.fillMaxWidth()) {
                 SpanText(modifier = Modifier.fontFamily(FONT_FAMILY).fontSize(24.px).margin(bottom = 6.px), text = "Payments")
                 SpanText(modifier = Modifier.fontFamily(FONT_FAMILY).fontSize(14.px).color(Colors.Gray), text = "Release funds and notify other open tabs instantly.")
             }
+            // Contact & Support icon button (positioned top-right of header)
+            Button(attrs = {
+                onClick { try { window.location.href = "/contact" } catch (_: Throwable) {} }
+                attr("title", "Contact & Support")
+                attr("style", "position:absolute; right:18px; top:18px; background:transparent; border:none; cursor:pointer; font-size:18px; padding:6px; border-radius:8px;")
+            }) { Text("💬") }
         }
 
         Box(modifier = Modifier.height(16.px))
